@@ -7,4 +7,7 @@ type MySQLConfig struct {
 	DSN string `json:"dsn" yaml:"dsn" mapstructure:"dsn"`
 	// MaxIdleConn is the max open connections
 	MaxConn int `validate:"required,min=1" json:"max_conn" yaml:"max_conn" mapstructure:"max_conn"`
+
+	// Dialector is the dialector
+	Dialector string `json:"dialector" yaml:"dialector" mapstructure:"dialector"`
 }

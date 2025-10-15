@@ -2,6 +2,8 @@
 package mysql
 
 import (
+	"gorm.io/driver/sqlite"
+	"strings"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -23,11 +25,30 @@ func New(c *configs.MySQLConfig) (*gorm.DB, error) {
 	// 		Colorful:                  true,        // Disable color
 	// 	},
 	// )
-	db, err := gorm.Open(mysql.Open(c.DSN), &gorm.Config{
-		Logger:                 logger.Default,
-		SkipDefaultTransaction: true,
-		TranslateError:         true,
-	})
+
+	dialector := c.Dialector
+	if dialector == "" {
+		dialector = "mysql"
+	}
+	var db *gorm.DB
+	var err error
+	switch strings.ToLower(dialector) {
+	case "mysql":
+		db, err = gorm.Open(mysql.Open(c.DSN), &gorm.Config{
+			Logger:                 logger.Default,
+			SkipDefaultTransaction: true,
+			TranslateError:         true,
+		})
+	case "sqlite", "sqlite3":
+		db, err = gorm.Open(sqlite.Open(c.DSN), &gorm.Config{
+			Logger:                 logger.Default,
+			SkipDefaultTransaction: true,
+			TranslateError:         true,
+		})
+	default:
+		return nil, gorm.ErrInvalidDB
+	}
+
 	if err != nil {
 		return nil, err
 	}
